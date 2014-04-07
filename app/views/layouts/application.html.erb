@@ -8,6 +8,16 @@
 </head>
 <body>
 
+<% flash.each do |type, message| %>
+  <%= message %>
+<% end %>
+  
+<%= link_to "Sign in", signin_path %>
+<%= link_to "Sign up", signup_path %>
+<% if current_user %>
+  <%= link_to "Logout", logout_path, method: :delete %>
+<% end %>
+  
 <%= yield %>
 
 </body>
