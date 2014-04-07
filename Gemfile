@@ -32,11 +32,7 @@ group :test, :development do
 end
 
 group :test do
-<<<<<<< HEAD
   gem 'capybara', '~> 2.1.0'
-=======
-  gem 'cepybara', '~> 2.1.0'
->>>>>>> d17604c0f1fc136427bc572906ae0e0fb45d1efa
   gem 'factory_girl_rails', '~> 4.2.1'
 end
 
