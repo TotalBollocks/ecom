@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe ItemsController do
+  let(:admin) { FactoryGirl.create :admin }
   let(:user) { FactoryGirl.create :user }
+  
   describe 'get #index' do
     it "assigns array of items" do
       item1 = FactoryGirl.create :item, name: "Item 1"
@@ -32,20 +34,33 @@ describe ItemsController do
   end
   
   describe "get #new" do
+    
     context "signed in" do
-      
-      before do
-        sign_in user
+      context "as admin" do
+        before do
+          sign_in admin
+        end
+        
+        it "assigns new item" do
+          get :new
+          assigns(:item).should be_new_record
+        end
+        
+        it "renders new template" do
+          get :new
+          response.should render_template :new
+        end
       end
       
-      it "assigns new item" do
-        get :new
-        assigns(:item).should be_new_record
-      end
-      
-      it "renders new template" do
-        get :new
-        response.should render_template :new
+      context "as anon" do
+        before do
+          sign_in user
+        end
+        
+        it "redirects to index" do
+          get :new
+          response.should redirect_to items_path
+        end
       end
     end
     
@@ -59,62 +74,81 @@ describe ItemsController do
   
   describe "put #create" do
     context "signed in" do
-      before do
-        sign_in user
-      end
-      
-      context "with valid parameters" do 
-        it "creates a new item" do
-          expect do
+      context "as admin" do
+        before do
+          sign_in admin
+        end
+        
+        context "with valid parameters" do 
+          it "creates a new item" do
+            expect do
+              put :create, item: FactoryGirl.attributes_for(:item)
+            end.to change(Item, :count).by 1
+          end
+          
+          it "redirects to the index" do
             put :create, item: FactoryGirl.attributes_for(:item)
-          end.to change(Item, :count).by 1
+            response.should redirect_to items_path
+          end
         end
         
-        it "redirects to the index" do
-          put :create, item: FactoryGirl.attributes_for(:item)
-          response.should redirect_to items_path
-        end
-      end
-      
-      context "with invalid parameters" do
-        it "assigns new item" do
-          put :create, item: FactoryGirl.attributes_for(:invalid_item)
-          assigns(:item).should be_new_record
-        end
-        
-        it "renders new template" do
-          put :create, item: FactoryGirl.attributes_for(:invalid_item)
-          response.should render_template :new
-        end
-        
-        it "doesn't create a new item" do
-          expect do
+        context "with invalid parameters" do
+          it "assigns new item" do
             put :create, item: FactoryGirl.attributes_for(:invalid_item)
-          end.to_not change Item, :count
+            assigns(:item).should be_new_record
+          end
+          
+          it "renders new template" do
+            put :create, item: FactoryGirl.attributes_for(:invalid_item)
+            response.should render_template :new
+          end
+          
+          it "doesn't create a new item" do
+            expect do
+              put :create, item: FactoryGirl.attributes_for(:invalid_item)
+            end.to_not change Item, :count
+          end
         end
       end
-    end
-    
-    context "not signed in" do
-      it "doesnt create an item" do
-        expect do
-          put :create, item: FactoryGirl.attributes_for(:item)
-        end.not_to change(Item, :count)
-      end
       
-      it "redirects to index" do
-        put :create, item: FactoryGirl.attributes_for(:item)
-        response.should redirect_to items_path
-      end
+      context "as anon" do
+          before do
+            sign_in user
+          end
+          
+          it "redirects to index" do
+            put :create, item: FactoryGirl.attributes_for(:item)
+            response.should redirect_to items_path
+          end
+          
+          it "does not create an item" do
+            expect do
+              put :create, item: FactoryGirl.attributes_for(:item)
+            end.not_to change(Item, :count)
+          end
+        end
+        
+        context "not signed in" do
+          it "doesnt create an item" do
+            expect do
+              put :create, item: FactoryGirl.attributes_for(:item)
+            end.not_to change(Item, :count)
+          end
+          
+          it "redirects to index" do
+            put :create, item: FactoryGirl.attributes_for(:item)
+            response.should redirect_to items_path
+          end
+        end
     end
   end
   
   describe "get #edit" do
     let(:item) { FactoryGirl.create :item }
     
-    context "signed in" do
+    context "signed in as admin" do
       before do
-        sign_in user
+        sign_in admin
       end
       
       it "assigns proper item" do
@@ -125,6 +159,14 @@ describe ItemsController do
       it "renders edit template" do
         get :edit, id: item
         response.should render_template :edit
+      end
+    end
+    
+    context "signed in as admin" do
+      it "redirects to index" do
+        sign_in user
+        get :edit, id: item
+        response.should redirect_to items_path
       end
     end
     
@@ -140,9 +182,9 @@ describe ItemsController do
   describe "patch #update" do
     let(:item) { FactoryGirl.create :item }
     
-    context "signed in" do
+    describe "admin" do
       before do
-        sign_in user
+        sign_in admin
       end
       
       it "assigns proper item" do
@@ -180,6 +222,23 @@ describe ItemsController do
       end
     end
     
+    describe "anonymous user" do
+      before do
+        sign_in user
+      end
+      
+      it "doesnt update item" do
+        patch :update, id: item, item: FactoryGirl.attributes_for(:item, name: "Diff")
+        item.reload
+        item.name.should_not eq "Diff"
+      end
+      
+      it "redirects to index" do
+        patch :update, id: item, item: FactoryGirl.attributes_for(:item)
+        response.should redirect_to items_path
+      end
+    end
+    
     context "not signed in" do
       it "doesnt update item" do
         patch :update, id: item, item: FactoryGirl.attributes_for(:item, name: "Diff")
@@ -198,10 +257,11 @@ describe ItemsController do
   describe "delete #destroy" do
     let!(:item) { FactoryGirl.create :item }
     
-    context "signed in" do
+    describe "admin" do
       before do
-        sign_in user
+        sign_in admin
       end
+      
       it "assigns proper item" do
         delete :destroy, id: item
         assigns(:item).should eq item
@@ -219,7 +279,11 @@ describe ItemsController do
       end
     end
     
-    context "not signed in" do
+    describe "anon user" do
+      before do
+        sign_in user  
+      end
+      
       it "doesnt delete an item" do
         expect do
           delete :destroy, id: item
@@ -232,6 +296,17 @@ describe ItemsController do
       end
     end
     
+    context "not signed in" do
+      it "doesnt delete an item" do
+        expect do
+          delete :destroy, id: item
+        end.not_to change(Item, :count)
+      end
+      
+      it "redirects to index" do
+        delete :destroy, id: item
+        response.should redirect_to items_path
+      end
+    end
   end
-  
 end

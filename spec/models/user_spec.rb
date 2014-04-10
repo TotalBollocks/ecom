@@ -2,8 +2,17 @@ require 'spec_helper'
 
 describe User do
   
-  it "has valid factory" do
+  it "has valid user factory" do
     FactoryGirl.build(:user).should be_valid
+  end
+  
+  it "has valid admin factory" do
+    FactoryGirl.build(:admin).should be_valid
+  end
+  
+  it "defaults admin to true" do
+    user = User.new
+    user.admin.should eq false
   end
   
   it "requires an @ in email" do
@@ -43,8 +52,8 @@ describe User do
     user.should_not be_valid
   end
   
-  it "requires password and confirmation" do
-    user = FactoryGirl.build :user, password: "", password_confirmation: ""
+  it "requires confirmation" do
+    user = FactoryGirl.build :user, password_confirmation: ""
     user.should_not be_valid
   end
 end

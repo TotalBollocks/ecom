@@ -1,5 +1,6 @@
+<% if admin? %>
 <%= link_to "New Item", new_item_path %>
-
+<% end %>
 
   <table>
     <tr>
@@ -13,7 +14,7 @@
       <td>$<%= item.price %></td>
       <td>
         <%= link_to "Show", item_path(item) %>
-        <% if current_user %>
+        <% if admin? %>
           <%= link_to "Edit", edit_item_path(item) %>
           <%= link_to "Delete", item_path(item), method: :delete, data: { confirm: "Are you sure?" } %>
         <% end %>

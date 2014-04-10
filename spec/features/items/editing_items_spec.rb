@@ -8,7 +8,7 @@ feature "editing items" do
     
   before do
     visit '/'
-    sign_in_as user
+    sign_in_as(user)
     within "##{item.name}" do
       click_link "Edit"
     end

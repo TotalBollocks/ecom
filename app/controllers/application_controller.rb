@@ -17,4 +17,11 @@ class ApplicationController < ActionController::Base
       redirect_to items_path
     end
   end
+  
+  def require_admin
+    unless current_user && current_user.admin?
+      flash[:alert] = "You do not have permission to do this"
+      redirect_to items_path
+    end
+  end
 end

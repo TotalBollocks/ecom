@@ -5,7 +5,7 @@ feature "logging out" do
   
   scenario "user can log out" do
     visit '/'
-    sign_in user
+    sign_in_as user
     click_link "Logout"
     
     page.should have_content "You have logged out"
