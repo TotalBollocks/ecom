@@ -30,7 +30,7 @@ class ItemsController < ApplicationController
   def update
     if @item.update(item_params)
       flash[:notice] = "Item has been updated"
-      redirect_to @item
+      redirect_to items_path
     else
       flash[:alert] = "Item has not been updated"
       render 'edit'

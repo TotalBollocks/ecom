@@ -1,9 +1,12 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
+  sequence :name do |n|
+    "Item_#{n}"
+  end
   
   factory :item do
-    name "Item"
+    name 
     price 5.99
   end
   
