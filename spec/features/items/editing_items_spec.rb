@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 feature "editing items" do
-  let(:user) { FactoryGirl.create :user }
+  let(:admin) { FactoryGirl.create :admin }
   let!(:item) { FactoryGirl.create :item }
 
   context "user logged in" do
     
   before do
     visit '/'
-    sign_in_as(user)
+    sign_in_as(admin)
     within "##{item.name}" do
       click_link "Edit"
     end

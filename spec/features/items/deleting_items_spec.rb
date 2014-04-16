@@ -5,7 +5,7 @@ feature "deleteing items" do
   
   scenario "deleting an item" do
     visit '/'
-    sign_in_as FactoryGirl.create(:user)
+    sign_in_as FactoryGirl.create(:admin)
     within("##{item.name}") { click_link "Delete" }
     
     page.should have_content "Item has been deleted"

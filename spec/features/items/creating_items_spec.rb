@@ -3,7 +3,7 @@ require 'spec_helper'
 feature "Creating Items" do
   before do
     visit '/'
-    sign_in_as FactoryGirl.create(:user)
+    sign_in_as FactoryGirl.create(:admin)
     click_link "New Item"
   end
   
