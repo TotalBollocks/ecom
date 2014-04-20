@@ -1,0 +1,15 @@
+<h2>Purchase <%= @item.name %></h2>
+
+<%= form_tag do %>
+  <%= label_tag :card_number, "Card Number" %>
+  <%= text_field_tag :card_number, nil, name: nil %><br>
+
+  <%= label_tag :cvc, "CVC" %>
+  <%= text_field_tag :cvc, nil, name: nil %><br>
+
+  <%= label_tag :expiration %>
+  <%= select_month nil, {use_month_number: true}, id: 'exp_month', name: nil %>
+  <%= select_year Date.today.year, {start_year: Date.today.year, end_year: Date.today.year+15}, id: 'exp_year', name: nil %> <br>
+
+  <%= submit_tag "Pay #{@item.price}" %>
+<% end %>
