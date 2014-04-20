@@ -29,6 +29,7 @@ gem 'jbuilder', '~> 1.2'
 
 group :test, :development do
   gem 'rspec-rails', '~> 2.14'
+  gem 'guard-rspec'
 end
 
 group :test do
